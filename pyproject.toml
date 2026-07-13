@@ -1,0 +1,14 @@
+[project]
+name = 'StreamerNet'
+requires-python = ">=3.9"
+version = "1.0.0"
+dependencies = [
+    "pytest",
+    "numpy",
+    "matplotlib",
+    "scipy",
+    "torch",
+    "torchvision",
+    "opencv-python",
+    "pandas"
+]
