@@ -1,12 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F # Often contains activation functions and other utilities
-NUM_CATEGORIES = sum(1 for line in open('emote_training_data/categories.txt'))
-
-
 
 class SimpleCNN(nn.Module):
-    def __init__(self):
+    def __init__(self, n_categories):
         super(SimpleCNN, self).__init__()
         # Layer definitions
         # Convolutional Layer 1
@@ -22,7 +19,7 @@ class SimpleCNN(nn.Module):
         # Fully connected layers
         # The input features for fc1 depends on the output shape after pooling
         self.fc1 = nn.Linear(in_features=32 * 11 * 9, out_features=128)
-        self.fc2 = nn.Linear(in_features=128, out_features=NUM_CATEGORIES) # Output for n classes
+        self.fc2 = nn.Linear(in_features=128, out_features=n_categories) # Output for n classes
 
     def forward(self, x):
         #conv layers
