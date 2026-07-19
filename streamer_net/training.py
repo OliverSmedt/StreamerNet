@@ -1,3 +1,5 @@
+import numpy as np
+
 from streamer_net.network_definition import SimpleCNN
 from streamer_net.dataset import PictureDataset
 import matplotlib.pyplot as plt
@@ -8,15 +10,20 @@ import torch
 EPOCHS = 30
 
 dir = os.path.join(os.getcwd(), "emote_training_data")
-training_set = PictureDataset(dir)
-training_loader = torch.utils.data.DataLoader(training_set, batch_size=30, shuffle=True)
+dataset = PictureDataset(dir)
+train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
+
+training_loader = torch.utils.data.DataLoader(train_set, batch_size=30, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_set, batch_size=30, shuffle=True)
 loss_fn = torch.nn.CrossEntropyLoss()
-model = SimpleCNN(training_set.n_categories)
+model = SimpleCNN(dataset.n_categories)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-
-train_loss = []
+full_train_loss = []
+full_test_loss = []
 for epoch in range(EPOCHS):
+    train_loss = []
+    test_loss = []
     for i, data in enumerate(training_loader):
         # Every data instance is an input + label pair
         inputs, labels = data
@@ -36,6 +43,19 @@ for epoch in range(EPOCHS):
 
         train_loss.append(loss.item())
 
-plt.plot(train_loss)
+    for i, data in enumerate(test_loader):
+        inputs, labels = data
+        outputs = model(inputs)
+        loss = loss_fn(outputs, labels)
+        test_loss.append(loss.item())
+
+    full_train_loss.append(np.mean(train_loss))
+    full_test_loss.append(np.mean(test_loss))
+
+
+
+plt.plot(full_train_loss, label = "train loss")
+plt.plot(full_test_loss, label = "test loss")
+plt.legend()
 plt.show()
 torch.save(model.state_dict(), "model")
