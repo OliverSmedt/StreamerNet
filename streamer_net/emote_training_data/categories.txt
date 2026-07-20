@@ -1,2 +1,3 @@
 hand-up
-no-hand
+normal
+smile
