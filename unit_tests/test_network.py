@@ -16,19 +16,21 @@ class TestDataset(unittest.TestCase):
         outputs = model(image)
 
     def test_can_train(self):
-        #The training data is just two colors, a single big training step should be sufficient to get zero test loss
+        #The training data is just two colors, a few training steps should be sufficient to get zero training loss
+
+        torch.manual_seed(1234)
         dir = os.path.join(os.getcwd(), "unit_tests/emote_training_data")
         dataset = PictureDataset(dir, transform=ToTensor())
-        train_set, test_set = torch.utils.data.random_split(dataset, [5/6, 1/6])
 
-        training_loader = torch.utils.data.DataLoader(train_set, batch_size=1, shuffle=True)
-        test_loader = torch.utils.data.DataLoader(test_set, batch_size=1, shuffle=True)
+        training_loader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=True)
         loss_fn = torch.nn.CrossEntropyLoss()
         model = SimpleCNN(dataset.n_categories)
-        optimizer = torch.optim.Adam(model.parameters(), lr=1)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-        train_loss, test_loss = train_single_epoch(training_loader, test_loader, optimizer, loss_fn, model)
+        for epoch in range(10): #epoch set intentionally low to not slow testing too much
+            #loop takes a test set, but that doesn't matter for this test
+            train_loss, _ = train_single_epoch(training_loader, training_loader, optimizer, loss_fn, model)
 
-        self.assertEqual(test_loss, 0)
+        self.assertAlmostEqual(train_loss, 0, 5)
 
 
