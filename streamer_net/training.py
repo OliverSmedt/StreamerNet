@@ -7,6 +7,7 @@ import torch.optim as optim
 import os
 import torch
 from data_augmentator import augmentation_transform
+from streamer_net.training_loop import train_single_epoch
 EPOCHS = 120
 
 dir = os.path.join(os.getcwd(), "emote_training_data")
@@ -17,44 +18,16 @@ training_loader = torch.utils.data.DataLoader(train_set, batch_size=30, shuffle=
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=30, shuffle=True)
 loss_fn = torch.nn.CrossEntropyLoss()
 model = SimpleCNN(dataset.n_categories)
-optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-
-
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 full_train_loss = []
 full_test_loss = []
+
 for epoch in range(EPOCHS):
-    train_loss = []
-    test_loss = []
-    for i, data in enumerate(training_loader):
-        # Every data instance is an input + label pair
-        inputs, labels = data
-
-        # Zero your gradients for every batch!
-        optimizer.zero_grad()
-
-        # Make predictions for this batch
-        outputs = model(inputs)
-
-        # Compute the loss and its gradients
-        loss = loss_fn(outputs, labels)
-        loss.backward()
-
-        # Adjust learning weights
-        optimizer.step()
-
-        train_loss.append(loss.item())
-
-    for i, data in enumerate(test_loader):
-        inputs, labels = data
-        outputs = model(inputs)
-        loss = loss_fn(outputs, labels)
-        test_loss.append(loss.item())
+    train_loss, test_loss = train_single_epoch(training_loader, test_loader, optimizer, loss_fn, model)
 
     full_train_loss.append(np.mean(train_loss))
     full_test_loss.append(np.mean(test_loss))
-
-
 
 plt.plot(full_train_loss, label = "train loss")
 plt.plot(full_test_loss, label = "test loss")
