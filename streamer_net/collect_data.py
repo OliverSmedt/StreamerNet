@@ -5,6 +5,7 @@ vid = cv2.VideoCapture(0)
 vid.set(3,200)
 vid.set(4,200)
 i=0
+
 while (True):
 
     # inside infinity loop

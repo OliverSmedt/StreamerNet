@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import torch.optim as optim
 import os
 import torch
-
-EPOCHS = 30
+from data_augmentator import augmentation_transform
+EPOCHS = 120
 
 dir = os.path.join(os.getcwd(), "emote_training_data")
-dataset = PictureDataset(dir)
+dataset = PictureDataset(dir, transform = augmentation_transform)
 train_set, test_set = torch.utils.data.random_split(dataset, [0.8, 0.2])
 
 training_loader = torch.utils.data.DataLoader(train_set, batch_size=30, shuffle=True)
@@ -18,6 +18,8 @@ test_loader = torch.utils.data.DataLoader(test_set, batch_size=30, shuffle=True)
 loss_fn = torch.nn.CrossEntropyLoss()
 model = SimpleCNN(dataset.n_categories)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+
+
 
 full_train_loss = []
 full_test_loss = []

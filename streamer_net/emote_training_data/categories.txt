@@ -1,2 +1,2 @@
-happy
-unhappy
+hand-up
+no-hand
